@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { BookingDetails } from '../types';
 import { UI_TRANSLATIONS } from '../data/content';
 import { useLanguage } from '../context/LanguageContext';
+import { CalendarPicker } from './CalendarPicker';
 
 interface BookingModalProps {
   isOpen: boolean;
@@ -16,10 +17,14 @@ export const BookingModal: React.FC<BookingModalProps> = ({ isOpen, onClose }) =
   const [submitted, setSubmitted] = useState(false);
   const [copied, setCopied] = useState(false);
 
+  const tomorrow = new Date();
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  const defaultDateStr = `${tomorrow.getFullYear()}-${String(tomorrow.getMonth() + 1).padStart(2, '0')}-${String(tomorrow.getDate()).padStart(2, '0')}`;
+
   const [formData, setFormData] = useState<BookingDetails>({
     serviceType: t.servicesList[0],
-    date: '2025-06-15',
-    timeSlot: '10:00 WIB',
+    date: defaultDateStr,
+    timeSlot: '10:30 WIB',
     name: '',
     email: '',
     company: '',
@@ -54,6 +59,22 @@ Saya ingin mengajukan jadwal konsultasi dengan rincian berikut:
   const generateWhatsAppUrl = () => {
     const text = encodeURIComponent(generateWhatsAppMessage());
     return `https://wa.me/6285813638787?text=${text}`;
+  };
+
+  const generateGoogleCalendarUrl = () => {
+    const [year, month, day] = formData.date.split('-');
+    const startTimeStr = formData.timeSlot.split(' ')[0] || '10:00';
+    const [hours, minutes] = startTimeStr.split(':');
+    
+    const startIso = `${year}${month}${day}T${hours || '10'}${minutes || '00'}00`;
+    const endHour = String(Number(hours || '10') + 1).padStart(2, '0');
+    const endIso = `${year}${month}${day}T${endHour}${minutes || '00'}00`;
+
+    const title = encodeURIComponent(`Konsultasi Brand - ${formData.serviceType} x Erica Adriana`);
+    const details = encodeURIComponent(`Sesi Konsultasi Brand bersama Erica Adriana.\nPemohon: ${formData.name} (${formData.email})\nLayanan: ${formData.serviceType}\nCatatan: ${formData.notes || '-'}`);
+    const location = encodeURIComponent(`Online / WhatsApp (${formData.email})`);
+
+    return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${startIso}/${endIso}&details=${details}&location=${location}`;
   };
 
   const handleCopyMessage = () => {
@@ -132,6 +153,16 @@ Saya ingin mengajukan jadwal konsultasi dengan rincian berikut:
                 <span>{t.sendWaBtn}</span>
               </a>
 
+              <a
+                href={generateGoogleCalendarUrl()}
+                target="_blank"
+                rel="noreferrer"
+                className="w-full py-3.5 bg-[#4285F4] text-white text-xs font-bold tracking-wider uppercase hover:bg-[#3367d6] transition-colors rounded-xl flex items-center justify-center gap-2.5 shadow-md cursor-pointer"
+              >
+                <span className="material-symbols-outlined text-lg">calendar_add_on</span>
+                <span>Tambahkan ke Google Calendar</span>
+              </a>
+
               <button
                 type="button"
                 onClick={handleCopyMessage}
@@ -195,37 +226,17 @@ Saya ingin mengajukan jadwal konsultasi dengan rincian berikut:
                     </div>
                   </div>
 
-                  {/* Date & Time Slot */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                      <label className="text-xs font-semibold text-[#181f21] uppercase tracking-wider block mb-2">
-                        {t.preferredDate}
-                      </label>
-                      <input
-                        type="date"
-                        required
-                        value={formData.date}
-                        onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-                        className="w-full p-3 rounded-xl bg-[#f8f3ea] border border-[#c3c7c8]/40 text-sm text-[#181f21] focus:outline-none focus:border-[#181f21]"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="text-xs font-semibold text-[#181f21] uppercase tracking-wider block mb-2">
-                        {t.timeSlot}
-                      </label>
-                      <select
-                        value={formData.timeSlot}
-                        onChange={(e) => setFormData({ ...formData, timeSlot: e.target.value })}
-                        className="w-full p-3 rounded-xl bg-[#f8f3ea] border border-[#c3c7c8]/40 text-sm text-[#181f21] focus:outline-none focus:border-[#181f21]"
-                      >
-                        {timeSlots.map((ts) => (
-                          <option key={ts} value={ts}>
-                            {ts}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
+                  {/* Interactive Calendar & Time Slot Picker */}
+                  <div>
+                    <label className="text-xs font-semibold text-[#181f21] uppercase tracking-wider block mb-2">
+                      Jadwal Kalender Konsultasi
+                    </label>
+                    <CalendarPicker
+                      selectedDate={formData.date}
+                      selectedTimeSlot={formData.timeSlot}
+                      onSelectDate={(d) => setFormData({ ...formData, date: d })}
+                      onSelectTimeSlot={(slot) => setFormData({ ...formData, timeSlot: slot })}
+                    />
                   </div>
 
                   <button

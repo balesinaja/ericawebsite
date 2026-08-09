@@ -20,9 +20,45 @@ export const CallToAction: React.FC<CallToActionProps> = ({ onBookCall }) => {
           </span>
         </h2>
 
-        <p className="text-base md:text-lg text-[#434749] max-w-2xl mx-auto mb-12 leading-relaxed">
+        <p className="text-base md:text-lg text-[#434749] max-w-2xl mx-auto mb-8 leading-relaxed">
           {t.description}
         </p>
+
+        {/* Calendar Availability Summary Card */}
+        <div className="max-w-xl mx-auto mb-10 p-6 bg-[#f8f3ea] border border-[#e8d3c0] rounded-2xl text-left shadow-sm">
+          <div className="flex items-center justify-between mb-3 border-b border-[#c3c7c8]/40 pb-3">
+            <div className="flex items-center gap-2">
+              <span className="material-symbols-outlined text-[#4b644e] text-2xl">calendar_month</span>
+              <h4 className="font-serif text-lg font-medium text-[#181f21]">Jadwal Konsultasi Terbuka</h4>
+            </div>
+            <span className="text-[10px] font-bold tracking-wider bg-[#25D366]/20 text-[#1ebd59] px-2.5 py-1 rounded-full uppercase">
+              Slot Tersedia
+            </span>
+          </div>
+
+          <p className="text-xs text-[#434749] leading-relaxed mb-4">
+            Pilih tanggal & sesi waktu melalui kalender interaktif untuk berkonsultasi langsung mengenai strategi Personal Brand maupun Business Brand Anda.
+          </p>
+
+          <div className="grid grid-cols-2 gap-3 text-xs mb-4">
+            <div className="bg-[#fef9ef] p-2.5 rounded-xl border border-[#c3c7c8]/30 flex items-center gap-2">
+              <span className="material-symbols-outlined text-sm text-[#4b644e]">schedule</span>
+              <span>09:00 - 16:30 WIB</span>
+            </div>
+            <div className="bg-[#fef9ef] p-2.5 rounded-xl border border-[#c3c7c8]/30 flex items-center gap-2">
+              <span className="material-symbols-outlined text-sm text-[#4b644e]">support_agent</span>
+              <span>Privat 1-on-1 Sesi</span>
+            </div>
+          </div>
+
+          <button
+            onClick={onBookCall}
+            className="w-full py-3 bg-[#4b644e] hover:bg-[#181f21] text-[#fef9ef] text-xs font-semibold tracking-wider uppercase transition-colors rounded-xl flex items-center justify-center gap-2 cursor-pointer shadow-md"
+          >
+            <span className="material-symbols-outlined text-base">calendar_month</span>
+            <span>Pilih Tanggal di Kalender Konsultasi</span>
+          </button>
+        </div>
 
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4 md:gap-6 flex-wrap">
           <button
